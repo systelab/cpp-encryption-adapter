@@ -25,8 +25,6 @@ Use of adapter features begins with an instance of `systelab::encryption::IEncry
 Encrypt a given input string using a password/secret:
 
 ```cpp
-#include ""
-
 std::unique_ptr<systelab::encryption::IEncryptionAdapter> encryptionAdapter = ...;
 std::string input = "This is the string to be encrypted";
 std::string password = "P@ssw0rdG0esHere";
