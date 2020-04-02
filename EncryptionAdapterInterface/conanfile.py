@@ -13,7 +13,7 @@ class EncryptionAdapterInterfaceConan(ConanFile):
     # No settings/options are necessary, this is header only
 
     def package(self):
-        self.copy("*.h", dst="include/EncryptionAdapterInterface")
+        self.copy("IEncryptionAdapter.h", dst="include/EncryptionAdapterInterface")
 
     def package_info(self):
         self.info.header_only()
