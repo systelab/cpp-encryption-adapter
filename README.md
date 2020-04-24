@@ -6,7 +6,7 @@
 
 # C++ Encryption Adapter interface
 
-This repository defines a library-agnostic API for C++ to encrypt data symmetrically.
+This repository defines a library-agnostic API for C++ to encrypt data.
 
 ## Supported features
 
