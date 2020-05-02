@@ -14,7 +14,8 @@ This repository defines a library-agnostic API for C++ to encrypt data.
 
 ## Available implementations
 
-* None public
+* [Caeser Cypher](https://github.com/systelab/cpp-caeser-cypher-encryption-adapter) (only for demo purposes)
+* See private repositories for production-ready implementations
 
 ## Usage
 
