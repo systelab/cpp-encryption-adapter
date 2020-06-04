@@ -20,9 +20,9 @@ class EncryptionAdapterTestUtilitiesConan(ConanFile):
         if self.options.gtest == "1.7.0":
             self.requires("gtest/1.7.0@systelab/stable")
         elif self.options.gtest == "1.8.1":
-            self.requires("gtest/1.8.1@bincrafters/stable")
+            self.requires("gtest/1.8.1")
         else:
-            self.requires("gtest/1.10.0@systelab/stable")
+            self.requires("gtest/1.10.0")
 
         self.requires("TestUtilitiesInterface/1.0.3@systelab/stable")
         if ("%s" % self.version) == "None":

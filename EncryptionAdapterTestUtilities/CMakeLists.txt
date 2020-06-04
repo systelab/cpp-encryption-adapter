@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 3.2)
 
 # Find external dependencides
-find_package(gtest)
+set(GTEST_PACKAGE_NAME gtest)
+find_package(${GTEST_PACKAGE_NAME})
+if (NOT TARGET ${GTEST_PACKAGE_NAME}::${GTEST_PACKAGE_NAME})
+    set(GTEST_PACKAGE_NAME GTest)
+    find_package(${GTEST_PACKAGE_NAME})
+endif()
+
 find_package(TestUtilitiesInterface)
 find_package(EncryptionAdapterInterface)
 
@@ -13,7 +19,10 @@ set(ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT EncryptionAdapterTestUtilities)
 file(GLOB_RECURSE ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT_SRC "*.cpp")
 file(GLOB_RECURSE ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT_HDR "*.h")
 add_library(${ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT} STATIC ${ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT_SRC} ${ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT_HDR})
-target_link_libraries(${ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT} gtest::gtest TestUtilitiesInterface::TestUtilitiesInterface EncryptionAdapterInterface::EncryptionAdapterInterface)
+target_link_libraries(${ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT}
+					  ${GTEST_PACKAGE_NAME}::${GTEST_PACKAGE_NAME}
+					  TestUtilitiesInterface::TestUtilitiesInterface
+					  EncryptionAdapterInterface::EncryptionAdapterInterface)
 
 # Configure source groups
 foreach(FILE ${ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT_SRC} ${ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT_HDR})
