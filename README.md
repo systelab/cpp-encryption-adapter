@@ -1,7 +1,6 @@
 [![Build Status](https://travis-ci.org/systelab/cpp-encryption-adapter.svg?branch=master)](https://travis-ci.org/systelab/cpp-encryption-adapter)
 [![Build status](https://ci.appveyor.com/api/projects/status/ruikmrb5myae2ovn?svg=true)](https://ci.appveyor.com/project/systelab/cpp-encryption-adapter)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7e19c714d00244419ea2bdc5401e7cc6)](https://www.codacy.com/app/systelab/cpp-encryption-adapter?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=systelab/cpp-encryption-adapter&amp;utm_campaign=Badge_Grade)
-[![JSONAdapterInterface](https://api.bintray.com/packages/systelab/conan/EncryptionAdapterInterface:systelab/images/download.svg)](https://bintray.com/systelab/conan/EncryptionAdapterInterface:systelab/_latestVersion)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/d7812dbf0bf64e45bf4078aee7ad6259)](https://www.codacy.com/gh/systelab/cpp-encryption-adapter/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=systelab/cpp-encryption-adapter&amp;utm_campaign=Badge_Grade)
 
 
 # C++ Encryption Adapter interface
