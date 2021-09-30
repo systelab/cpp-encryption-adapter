@@ -26,11 +26,13 @@ class EncryptionAdapterTestUtilitiesConan(ConanFile):
         else:
             self.requires(f"gtest/{self.options.gtest}")
 
-        self.requires("TestUtilitiesInterface/1.0.5@systelab/stable")
+        self.requires("TestUtilitiesInterface/1.0.8@systelab/stable")
+
         if ("%s" % self.version) == "None":
-            self.requires("EncryptionAdapterInterface/%s@systelab/stable" % os.environ['VERSION'])
+            channel = os.environ['CHANNEL'] if "CHANNEL" in os.environ else "stable"
+            self.requires(f"EncryptionAdapterInterface/{os.environ['VERSION']}@systelab/{channel}")
         else:
-            self.requires("EncryptionAdapterInterface/%s@systelab/stable" % self.version)
+            self.requires(f"EncryptionAdapterInterface/{self.version}@systelab/{self.channel}")
 
     def build(self):
         cmake = CMake(self)
