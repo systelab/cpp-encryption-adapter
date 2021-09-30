@@ -11,6 +11,7 @@ class EncryptionAdapterInterfaceConan(ConanFile):
     license = "MIT"
     generators = "cmake_find_package"
     # No settings/options are necessary, this is header only
+    exports_sources = "*.h"
 
     def package(self):
         self.copy("IEncryptionAdapter.h", dst="include/EncryptionAdapterInterface")
