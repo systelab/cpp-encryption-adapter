@@ -26,15 +26,15 @@ Encrypt a given input string using a password/secret:
 
 ```cpp
 std::unique_ptr<systelab::encryption::IEncryptionAdapter> encryptionAdapter = ...;
+systelab::encryption::SecurityKey password = [](){ return std::string("P@ssw0rdG0esHere"); };
 std::string input = "This is the string to be encrypted";
-std::string password = "P@ssw0rdG0esHere";
-std::string encryptedData = encryptionAdapter->encryptString(input, password);
+std::string encryptedData = encryptionAdapter->encryptString(password, input);
 ```
 
 The obtained string can be decrypted as follows:
 
 ```cpp
-std::string decryptedData = encryptionAdapter->decryptString(encryptedData, password);
+std::string decryptedData = encryptionAdapter->decryptString(password, encryptedData);
 ```
 
 At this point, the returned `decryptedData` string should have the same value than the initial `input` string.
