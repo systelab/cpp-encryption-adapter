@@ -15,6 +15,7 @@ class EncryptionAdapterInterfaceConan(ConanFile):
 
     def package(self):
         self.copy("IEncryptionAdapter.h", dst="include/EncryptionAdapterInterface")
+        self.copy("SecurityKey.h", dst="include/EncryptionAdapterInterface")
 
     def package_info(self):
         self.info.header_only()

@@ -1,5 +1,13 @@
 # Summary of changes
 
+## Changes for version 1.1.0 (11 Apr 2022)
+
+### Breaking changes
+
+- SecurityKey class added
+- encryptString, decryptString methods adopt SecurityKey type object as parameter
+
+
 ## Changes for version 1.0.5 (30 Sep 2021)
 
 ### Bug Fixes
