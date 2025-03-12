@@ -126,8 +126,8 @@ pipeline
 			{
 				script
 				{
-					sh "conan upload ${packageNameInterface}/${version}@systelab/${channel} --all -r systelab-conan-local --force"
-					sh "conan upload ${packageNameTestUtilities}/${version}@systelab/${channel} --all -r systelab-conan-local --force"
+					bat script:"conan upload ${packageNameInterface}/${version}@systelab/${channel} --all -r systelab-conan-local --force", label: "Uploading ${packageNameInterface} package to Artifactory"
+					bat script:"conan upload ${packageNameTestUtilities}/${version}@systelab/${channel} --all -r systelab-conan-local --force", label: "Uploading ${packageNameTestUtilities} package to Artifactory"
 				}
 			}
 		}
