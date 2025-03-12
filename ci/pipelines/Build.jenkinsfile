@@ -109,8 +109,7 @@ pipeline
 					{ arch ->
 						configs.each
 						{ config ->
-							def buildFolder = "build/${config}-${arch}"
-							bat "conan test test_package/conanfile.py ${packageNameInterface}/${version}@systelab/${channel} --profile=${profile} -s arch=${arch} -s build_type=${config}"
+							bat "conan test test_package/conanfile.py ${packageNameInterface}/${version}@systelab/${channel} --profile=${profile} -e VERSION=${version} -e CHANNEL=${channel} -s arch=${arch} -s build_type=${config} "
 						}
 					}
 				}
@@ -130,6 +129,18 @@ pipeline
 					sh "conan upload ${packageNameInterface}/${version}@systelab/${channel} --all -r systelab-conan-local --force"
 					sh "conan upload ${packageNameTestUtilities}/${version}@systelab/${channel} --all -r systelab-conan-local --force"
 				}
+			}
+		}
+		
+		post
+		{
+			always
+			{
+				script
+				{
+					currentBuild.description = "${version}/${channel}"
+				}
+				cleanupWorkspace()
 			}
 		}
 	}

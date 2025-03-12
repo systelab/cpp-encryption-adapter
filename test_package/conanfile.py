@@ -4,6 +4,9 @@ class EncryptionAdapterTestUtilitiesTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake_find_package"
 
+    def requirements(self):
+        self.requires(f"EncryptionAdapterTestUtilities/{os.environ['VERSION']}@systelab/{os.environ['CHANNEL']}")
+
     def build(self):
         cmake = CMake(self)
         cmake.configure()

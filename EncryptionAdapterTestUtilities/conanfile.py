@@ -12,19 +12,12 @@ class EncryptionAdapterTestUtilitiesConan(ConanFile):
     license = "MIT"
     generators = "cmake_find_package"
     settings = "os", "compiler", "build_type", "arch"
-    options = {"gtest": ["1.7.0", "1.8.1", "1.10.0"]}
-    default_options = "gtest=1.10.0"
     exports_sources = "*"
 
     def requirements(self):
         self.requires("gtest/1.14.0#4372c5aed2b4018ed9f9da3e218d18b3")
         self.requires("TestUtilitiesInterface/1.0.8@systelab/stable")
-
-        if ("%s" % self.version) == "None":
-            channel = os.environ['CHANNEL'] if "CHANNEL" in os.environ else "stable"
-            self.requires(f"EncryptionAdapterInterface/{os.environ['VERSION']}@systelab/{channel}")
-        else:
-            self.requires(f"EncryptionAdapterInterface/{self.version}@systelab/{self.channel}")
+        self.requires(f"EncryptionAdapterInterface/{os.environ['VERSION']}@systelab/{os.environ['CHANNEL']}")
 
     def build(self):
         cmake = CMake(self)
