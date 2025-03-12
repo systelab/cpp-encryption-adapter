@@ -109,7 +109,7 @@ pipeline
 					{ arch ->
 						configs.each
 						{ config ->
-							bat "conan test test_package/conanfile.py ${packageNameInterface}/${version}@systelab/${channel} --profile=${profile} -e VERSION=${version} -e CHANNEL=${channel} -s arch=${arch} -s build_type=${config} "
+							bat "conan test test_package/conanfile.py ${packageNameInterface}/${version}@systelab/${channel} --profile=${profile} -e VERSION=${version} -e CHANNEL=${channel} -s arch=${arch} -s build_type=${config}"
 						}
 					}
 				}
@@ -131,8 +131,9 @@ pipeline
 				}
 			}
 		}
-		
-		post
+	}
+	
+	post
 		{
 			always
 			{
@@ -143,5 +144,4 @@ pipeline
 				cleanupWorkspace()
 			}
 		}
-	}
 }
