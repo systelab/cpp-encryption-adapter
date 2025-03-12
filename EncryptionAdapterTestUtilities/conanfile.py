@@ -16,11 +16,8 @@ class EncryptionAdapterTestUtilitiesConan(ConanFile):
     default_options = "gtest=1.10.0"
     exports_sources = "*"
 
-    def build_requires(self):
-        pass
-
     def requirements(self):
-        self.build_requires("gtest/1.14.0#4372c5aed2b4018ed9f9da3e218d18b3")
+        self.requires("gtest/1.14.0#4372c5aed2b4018ed9f9da3e218d18b3")
         self.requires("TestUtilitiesInterface/1.0.8@systelab/stable")
 
         if ("%s" % self.version) == "None":
