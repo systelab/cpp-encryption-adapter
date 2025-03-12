@@ -141,7 +141,7 @@ pipeline
 				{
 					currentBuild.description = "${version}/${channel}"
 				}
-				cleanupWorkspace()
+				// cleanupWorkspace()
 			}
 		}
 }
