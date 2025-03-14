@@ -89,7 +89,7 @@ pipeline
 									def buildFolder = "build-${config}-${arch}"
 									bat script: "conan install . --install-folder ${buildFolder} --profile=${env.WORKSPACE}/${profile} -e VERSION=${version} -e CHANNEL=${channel} -s build_type=${config} -s arch=${arch}", label: 'Installing dependencies'
 									bat script: "conan build . --build-folder ${buildFolder}", label: 'Building'
-									bat script: "conan export-pkg . ${packageNameTestUtilities}/${version}@systelab/${channel} --profile=${env.WORKSPACE}/${profile} -e VERSION=${version} -e CHANNEL=${channel} -s build_type=${config} -s arch=${arch} --build-folder ${buildFolder} --force", label: "Exporting package ${packageNameTestUtilities}/${version}@systelab/${channel}"
+									bat script: "conan export-pkg . ${packageNameTestUtilities}/${version}@systelab/${channel} --build-folder ${buildFolder} --force", label: "Exporting package ${packageNameTestUtilities}/${version}@systelab/${channel}"
 								}
 							}
 						}
