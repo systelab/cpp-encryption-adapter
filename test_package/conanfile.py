@@ -1,13 +1,12 @@
+import os
 from conans import ConanFile, CMake
 
 class EncryptionAdapterTestUtilitiesTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake_find_package"
-    options = {"gtest": ["1.7.0", "1.8.1", "1.10.0"]}
-    default_options = "gtest=1.10.0"
 
-    def configure(self):
-        self.options["EncryptionAdapterTestUtilities"].gtest = self.options.gtest
+    def requirements(self):
+        self.requires(f"EncryptionAdapterTestUtilities/{os.environ['VERSION']}@systelab/{os.environ['CHANNEL']}")
 
     def build(self):
         cmake = CMake(self)
