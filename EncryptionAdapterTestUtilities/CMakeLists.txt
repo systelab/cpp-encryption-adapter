@@ -1,14 +1,21 @@
 cmake_minimum_required(VERSION 3.2)
 
-# Find external dependencides
-set(GTEST_PACKAGE_NAME gtest)
-find_package(${GTEST_PACKAGE_NAME})
-if (NOT TARGET ${GTEST_PACKAGE_NAME}::${GTEST_PACKAGE_NAME})
-    set(GTEST_PACKAGE_NAME GTest)
-    find_package(${GTEST_PACKAGE_NAME})
+project(EncryptionAdapterTestUtilities)
+
+# Find external dependencies
+find_package(gtest CONFIG QUIET)
+if (TARGET gtest::gtest)
+    set(GTEST_TARGET gtest::gtest)
+else()
+    find_package(GTest CONFIG REQUIRED)
+    if (TARGET GTest::gtest)
+        set(GTEST_TARGET GTest::gtest)
+    else()
+        set(GTEST_TARGET GTest::GTest)
+    endif()
 endif()
 
-find_package(TestUtilitiesInterface)
+find_package(test-utilities-interface CONFIG REQUIRED)
 find_package(EncryptionAdapterInterface)
 
 # Add project folder into includes
@@ -20,8 +27,8 @@ file(GLOB_RECURSE ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT_SRC "*.cpp")
 file(GLOB_RECURSE ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT_HDR "*.h")
 add_library(${ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT} STATIC ${ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT_SRC} ${ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT_HDR})
 target_link_libraries(${ENCRYPTION_ADAPTER_TEST_UTILITIES_PROJECT}
-					  ${GTEST_PACKAGE_NAME}::${GTEST_PACKAGE_NAME}
-					  TestUtilitiesInterface::TestUtilitiesInterface
+                      ${GTEST_TARGET}
+					  test-utilities-interface::test-utilities-interface
 					  EncryptionAdapterInterface::EncryptionAdapterInterface)
 
 # Configure source groups

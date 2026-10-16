@@ -12,44 +12,37 @@ configuration:
 
 environment:
   global:
-    PYTHON: "C:\\Python36"
     CYG_ROOT: C:\cygwin64
+    CONAN_HOME: "%APPVEYOR_BUILD_FOLDER%\\.conan2"
 
   matrix:
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017    
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
     arch: x86
     platform: Win32
-    visual_studio: Visual Studio 15 2017
-    compiler_toolset: v141
-    gtest: 1.7.0
+    visual_studio: Visual Studio 17 2022
 
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
     arch: x86_64
     platform: x64
-    visual_studio: Visual Studio 16 2019
-    compiler_toolset: v142
-    gtest: 1.10.0
+    visual_studio: Visual Studio 17 2022
 
 install:
-  - "SET PATH=%PYTHON%;%PYTHON%/Scripts/;%PATH%"
-  - pip.exe install conan
-  - conan user
-  - conan remote add systelab-public https://systelab.jfrog.io/artifactory/api/conan/cpp-conan-production-local
+  - "SET PATH=C:\\Python311;C:\\Python311\\Scripts;%PATH%"
+  - python -m pip install "conan==2.20.0"
+  - conan profile detect --force
+  - conan remote add aid-conan-production-local https://systelab.jfrog.io/artifactory/api/conan/cpp-conan-production-local
   - conan --version
 
 before_build:
-  - conan export-pkg EncryptionAdapterInterface/conanfile.py EncryptionAdapterInterface/%APPVEYOR_BUILD_VERSION%@systelab/stable -s build_type=%CONFIGURATION% -s compiler.toolset=%COMPILER_TOOLSET% -s arch=%ARCH%
-  - md build
-  - cd build
-  - conan install ../EncryptionAdapterTestUtilities -s build_type=%CONFIGURATION% -s compiler.toolset=%COMPILER_TOOLSET% -s arch=%ARCH% -e VERSION="%APPVEYOR_BUILD_VERSION%" -o gtest=%GTEST%
-  - cmake .. -G "%VISUAL_STUDIO%" -A %PLATFORM%
+  - conan export-pkg EncryptionAdapterInterface/conanfile.py --name encryption-adapter-interface --version %APPVEYOR_BUILD_VERSION% --output-folder build
+  - conan install EncryptionAdapterTestUtilities --version %APPVEYOR_BUILD_VERSION% --output-folder build --profile:all default --settings:host os=Windows --settings:host arch=%ARCH% --settings:host compiler=msvc --settings:host compiler.version=194 --settings:host compiler.cppstd=20 --settings:host compiler.runtime=dynamic --settings:host build_type=%CONFIGURATION% --build=missing
 
-build:
-  project: $(APPVEYOR_BUILD_FOLDER)\build\EncryptionAdapter.sln
+build_script:
+  - conan build EncryptionAdapterTestUtilities --version %APPVEYOR_BUILD_VERSION% --output-folder build --profile:all default --settings:host os=Windows --settings:host arch=%ARCH% --settings:host compiler=msvc --settings:host compiler.version=194 --settings:host compiler.cppstd=20 --settings:host compiler.runtime=dynamic --settings:host build_type=%CONFIGURATION%
 
 after_build:
-  - conan export-pkg ../EncryptionAdapterTestUtilities/conanfile.py EncryptionAdapterTestUtilities/%APPVEYOR_BUILD_VERSION%@systelab/stable -s build_type=%CONFIGURATION% -s compiler.toolset=%COMPILER_TOOLSET% -s arch=%ARCH% -o gtest=%GTEST%
-  - conan test ../test_package/conanfile.py EncryptionAdapterTestUtilities/%APPVEYOR_BUILD_VERSION%@systelab/stable -s build_type=%CONFIGURATION% -s compiler.toolset=%COMPILER_TOOLSET% -s arch=%ARCH% -o gtest=%GTEST%
+  - conan export-pkg EncryptionAdapterTestUtilities/conanfile.py --name encryption-adapter-test-utilities --version %APPVEYOR_BUILD_VERSION% --output-folder build --profile:all default --settings:host os=Windows --settings:host arch=%ARCH% --settings:host compiler=msvc --settings:host compiler.version=194 --settings:host compiler.cppstd=20 --settings:host compiler.runtime=dynamic --settings:host build_type=%CONFIGURATION%
+  - conan test test_package/conanfile.py encryption-adapter-test-utilities/%APPVEYOR_BUILD_VERSION% --profile:all default --settings:host os=Windows --settings:host arch=%ARCH% --settings:host compiler=msvc --settings:host compiler.version=194 --settings:host compiler.cppstd=20 --settings:host compiler.runtime=dynamic --settings:host build_type=%CONFIGURATION%
 
 artifacts:
   - path: 'build/lib/%CONFIGURATION%/EncryptionAdapterTestUtilities.lib'
@@ -58,8 +51,8 @@ artifacts:
 deploy_script:
   - ps: >- 
       if($env:appveyor_repo_tag -eq 'True') {
-        conan upload EncryptionAdapterInterface/$env:appveyor_build_version@systelab/stable --all -r systelab-public --force
-        conan upload EncryptionAdapterTestUtilities/$env:appveyor_build_version@systelab/stable --all -r systelab-public --force
+        conan upload encryption-adapter-interface/$env:appveyor_build_version --remote aid-conan-production-local --confirm --force
+        conan upload encryption-adapter-test-utilities/$env:appveyor_build_version --remote aid-conan-production-local --confirm --force
       } else {
         echo "Not uploading because this is not a tag build"
       }
