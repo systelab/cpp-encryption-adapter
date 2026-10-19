@@ -1,46 +1,44 @@
 language: cpp
 
-env:
-  global:
-    - CONAN_HOME=$HOME/.conan2/cpp-encryption-adapter
-
 matrix:
   include:
   - os: linux
-    dist: focal
+    dist: xenial
     language: python
     compiler: gcc
-    python: "3.10"
+    python: "3.7"
     addons:
       apt:
         sources:
           - ubuntu-toolchain-r-test
         packages:
-          - gcc-10
-          - g++-10
+          - gcc-7
+          - g++-7
     env:
-      - COMPILER_NAME=gcc-10
+      - COMPILER_NAME=gcc-7
       - BUILD_TYPE=Release
       - CONAN_BUILD_TYPE=Release
       - COMPILER_LIBCXX=libstdc++11
+      - GTEST_VERSION=1.8.1
 
   - os: linux
-    dist: focal
+    dist: xenial
     language: python
     compiler: gcc
-    python: "3.10"
+    python: "3.7"
     addons:
       apt:
         sources:
           - ubuntu-toolchain-r-test
         packages:
-          - gcc-10
-          - g++-10
+          - gcc-7
+          - g++-7
     env:
-      - COMPILER_NAME=gcc-10
+      - COMPILER_NAME=gcc-7
       - BUILD_TYPE=Debug
       - CONAN_BUILD_TYPE=Debug
       - COMPILER_LIBCXX=libstdc++11
+      - GTEST_VERSION=1.8.1
 
   - os: osx
     osx_image: xcode12.2
@@ -50,6 +48,7 @@ matrix:
       - BUILD_TYPE=Release
       - CONAN_BUILD_TYPE=Release
       - COMPILER_LIBCXX=libc++
+      - GTEST_VERSION=1.8.1
       - HOMEBREW_NO_AUTO_UPDATE=1
     cache:
       directories:
@@ -57,43 +56,44 @@ matrix:
         - /usr/local/Homebrew
 
 install: 
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 90; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 90; fi
-  - python3 -m pip install "conan==2.20.0" "cmake>=3.15"
-  - conan remote add aid-conan-production-local https://systelab.jfrog.io/artifactory/api/conan/cpp-conan-production-local
-  - conan profile detect --force
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 90; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then pip install conan; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install conan; fi
+  - conan user
+  - conan remote add systelab-public https://systelab.jfrog.io/artifactory/api/conan/cpp-conan-production-local
   - conan --version
 
 script:
   - g++ --version
-  - mkdir -p build
   - |
     if [ -n "$TRAVIS_TAG" ]; then
-      conan export-pkg EncryptionAdapterInterface/conanfile.py --name encryption-adapter-interface --version "${TRAVIS_TAG:1}" --output-folder build/interface --force;
+      conan export-pkg EncryptionAdapterInterface/conanfile.py "EncryptionAdapterInterface/${TRAVIS_TAG:1}@systelab/stable" -s build_type=${CONAN_BUILD_TYPE} -s compiler.libcxx=${COMPILER_LIBCXX};
     else
-      conan export-pkg EncryptionAdapterInterface/conanfile.py --name encryption-adapter-interface --version "0.0.${TRAVIS_BUILD_NUMBER}" --output-folder build/interface --force;
+      conan export-pkg EncryptionAdapterInterface/conanfile.py "EncryptionAdapterInterface/0.0.${TRAVIS_BUILD_NUMBER}@systelab/stable" -s build_type=${CONAN_BUILD_TYPE} -s compiler.libcxx=${COMPILER_LIBCXX};
     fi
+  - mkdir -p build
   - cd build
   - |
     if [ -n "$TRAVIS_TAG" ]; then
-      conan install ../EncryptionAdapterTestUtilities --version "${TRAVIS_TAG:1}" --output-folder . --profile:all default --settings:host build_type=${CONAN_BUILD_TYPE} --settings:host compiler.libcxx=${COMPILER_LIBCXX} --settings:host compiler.cppstd=20 --build=missing;
-      conan build ../EncryptionAdapterTestUtilities --version "${TRAVIS_TAG:1}" --output-folder . --profile:all default --settings:host build_type=${CONAN_BUILD_TYPE} --settings:host compiler.libcxx=${COMPILER_LIBCXX} --settings:host compiler.cppstd=20;
+      conan install ../EncryptionAdapterTestUtilities -s build_type=${CONAN_BUILD_TYPE} -s compiler.libcxx=${COMPILER_LIBCXX} -o gtest=${GTEST_VERSION} -e VERSION="${TRAVIS_TAG:1}";
     else
-      conan install ../EncryptionAdapterTestUtilities --version "0.0.${TRAVIS_BUILD_NUMBER}" --output-folder . --profile:all default --settings:host build_type=${CONAN_BUILD_TYPE} --settings:host compiler.libcxx=${COMPILER_LIBCXX} --settings:host compiler.cppstd=20 --build=missing;
-      conan build ../EncryptionAdapterTestUtilities --version "0.0.${TRAVIS_BUILD_NUMBER}" --output-folder . --profile:all default --settings:host build_type=${CONAN_BUILD_TYPE} --settings:host compiler.libcxx=${COMPILER_LIBCXX} --settings:host compiler.cppstd=20;
+      conan install ../EncryptionAdapterTestUtilities -s build_type=${CONAN_BUILD_TYPE} -s compiler.libcxx=${COMPILER_LIBCXX} -o gtest=${GTEST_VERSION} -e VERSION="0.0.${TRAVIS_BUILD_NUMBER}";
     fi
+  - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+  - make
   - |
     if [ -n "$TRAVIS_TAG" ]; then
-      conan export-pkg ../EncryptionAdapterTestUtilities/conanfile.py --name encryption-adapter-test-utilities --version "${TRAVIS_TAG:1}" --output-folder . --profile:all default --settings:host build_type=${CONAN_BUILD_TYPE} --settings:host compiler.libcxx=${COMPILER_LIBCXX} --settings:host compiler.cppstd=20 --force;
+      conan export-pkg ../EncryptionAdapterTestUtilities/conanfile.py "EncryptionAdapterTestUtilities/${TRAVIS_TAG:1}@systelab/stable" -s build_type=${CONAN_BUILD_TYPE} -s compiler.libcxx=${COMPILER_LIBCXX} -o gtest=${GTEST_VERSION};
     else
-      conan export-pkg ../EncryptionAdapterTestUtilities/conanfile.py --name encryption-adapter-test-utilities --version "0.0.${TRAVIS_BUILD_NUMBER}" --output-folder . --profile:all default --settings:host build_type=${CONAN_BUILD_TYPE} --settings:host compiler.libcxx=${COMPILER_LIBCXX} --settings:host compiler.cppstd=20 --force;
+      conan export-pkg ../EncryptionAdapterTestUtilities/conanfile.py "EncryptionAdapterTestUtilities/0.0.${TRAVIS_BUILD_NUMBER}@systelab/stable" -s build_type=${CONAN_BUILD_TYPE} -s compiler.libcxx=${COMPILER_LIBCXX} -o gtest=${GTEST_VERSION};
     fi
   - |
     if [ "$BUILD_TYPE" == "Release" ] || [ "$BUILD_TYPE" == "Debug" ]; then
       if [ -n "$TRAVIS_TAG" ]; then
-        conan test ../test_package/conanfile.py encryption-adapter-test-utilities/${TRAVIS_TAG:1} --profile:all default --settings:host build_type=${CONAN_BUILD_TYPE} --settings:host compiler.libcxx=${COMPILER_LIBCXX} --settings:host compiler.cppstd=20;
+        conan test ../test_package/conanfile.py EncryptionAdapterTestUtilities/${TRAVIS_TAG:1}@systelab/stable -s build_type=${CONAN_BUILD_TYPE} -s compiler.libcxx=${COMPILER_LIBCXX} -o gtest=${GTEST_VERSION};
       else
-        conan test ../test_package/conanfile.py encryption-adapter-test-utilities/0.0.${TRAVIS_BUILD_NUMBER} --profile:all default --settings:host build_type=${CONAN_BUILD_TYPE} --settings:host compiler.libcxx=${COMPILER_LIBCXX} --settings:host compiler.cppstd=20;
+        conan test ../test_package/conanfile.py EncryptionAdapterTestUtilities/0.0.${TRAVIS_BUILD_NUMBER}@systelab/stable -s build_type=${CONAN_BUILD_TYPE} -s compiler.libcxx=${COMPILER_LIBCXX} -o gtest=${GTEST_VERSION};
       fi
     fi
   - cd ..
