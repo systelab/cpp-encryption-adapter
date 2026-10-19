@@ -1,1 +1,4 @@
 build*
+.conan/
+.conan2/
+CMakeUserPresets.json
